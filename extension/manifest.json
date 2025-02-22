@@ -1,0 +1,31 @@
+{
+    "manifest_version": 3,
+    "name": "Universal Article Processor",
+    "version": "1.0",
+    "description": "Extracts rich content from any webpage including text, images, and formulas",
+    "permissions": [
+        "activeTab",
+        "scripting",
+        "contextMenus",
+        "notifications",
+        "tabs"
+    ],
+    "host_permissions": ["<all_urls>"],
+    "background": {
+        "service_worker": "background.js"
+    },
+    "content_scripts": [{
+        "matches": ["<all_urls>"],
+        "js": ["content-script.js"],
+        "run_at": "document_end"
+    }],
+    "action": {
+        "default_popup": "popup/popup.html",
+        "default_icon": {
+            "128": "icons/chrome-extension-icon-11.jpg"
+        }
+    },
+    "icons": {
+        "128": "icons/chrome-extension-icon-11.jpg"
+    }
+}
