@@ -73,6 +73,13 @@ async def read_page(content: PageContent):
             if text:
                 text_content += text + '\n\n'
         
+        code_blocks = []
+        for code in soup.find_all(['pre', 'code']):
+            code_text = code.get_text(strip=True)
+            if code_text:
+                code_blocks.append(code_text)
+
+        
         # Clean up text content
         text_content = re.sub(r'\n{3,}', '\n\n', text_content.strip())
         
@@ -84,11 +91,13 @@ async def read_page(content: PageContent):
             "images": images,
             "math_formulas": math_formulas,
             "tables": tables,
+            "code_blocks": code_blocks,  # Add code blocks to response
             "stats": {
                 "image_count": len(images),
                 "formula_count": len(math_formulas),
                 "table_count": len(tables),
-                "text_length": len(text_content)
+                "text_length": len(text_content),
+                "code_block_count": len(code_blocks)  # Add code block count
             }
         }
         

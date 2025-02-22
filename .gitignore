@@ -28,3 +28,4 @@ backend/uploads/*.pdf
 backend/1.0.0
 backend/1.11.0
 backend/uploads/*
+.venv/
