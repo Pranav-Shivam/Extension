@@ -4,10 +4,11 @@ from pydantic import BaseModel
 from typing import Optional
 from bs4 import BeautifulSoup
 import uvicorn
+from server import router
 import re
 
 app = FastAPI()
-
+app.include_router(router)
 # Add CORS middleware
 app.add_middleware(
     CORSMiddleware,

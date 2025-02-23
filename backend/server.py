@@ -1,87 +1,139 @@
 import time
 import asyncio
-from fastapi import FastAPI
+from fastapi import APIRouter, HTTPException
 from transformers import BartForConditionalGeneration, BartTokenizer
 import torch
 import uvicorn
 from pydantic import BaseModel
+import requests
+from typing import Dict, Optional
+import json
 
 
-app = FastAPI()
+router = APIRouter()
 
 # Global model variables
-model = None
-tokenizer = None
-last_request_time = None
-unload_timeout = 300  # 5 minutes (300 seconds)
+models: Dict[str, any] = {}  # Store multiple models
+tokenizers: Dict[str, any] = {}
+last_request_times: Dict[str, float] = {}
+unload_timeout = 300  # 5 minutes
+
+# Model configurations
+MODEL_CONFIGS = {
+    "summarization": {
+        "model_name": "facebook/bart-large-cnn",
+        "type": "local",
+        "device": "cuda" if torch.cuda.is_available() else "cpu",
+    },
+    "doc-qna": {
+        "model_name": "impira/layoutlm-document-qa",
+        "type": "remote",
+        "endpoint": "http://192.168.0.5:8000/process/",
+    }
+}
 
 
-def load_model():
-    """Loads the model if not already loaded."""
-    global model, tokenizer
-    if model is None or tokenizer is None:
-        print("Loading model...")
-        model_name = "facebook/bart-large-cnn"
-        tokenizer = BartTokenizer.from_pretrained(model_name)
-        model = BartForConditionalGeneration.from_pretrained(model_name)
-
-        # Move model to GPU if available
-        if torch.cuda.is_available():
-            model.to("cuda")
-            print("Model moved to GPU")
+def load_model(model_id: str):
+    """Loads the specified model if not already loaded."""
+    global models, tokenizers
+    
+    if model_id not in MODEL_CONFIGS:
+        raise HTTPException(status_code=404, detail=f"Model {model_id} not found")
+    
+    config = MODEL_CONFIGS[model_id]
+    
+    if config["type"] == "local":
+        if model_id not in models or models[model_id] is None:
+            print(f"Loading local model {model_id}...")
+            tokenizers[model_id] = BartTokenizer.from_pretrained(config["model_name"])
+            models[model_id] = BartForConditionalGeneration.from_pretrained(config["model_name"])
+            
+            if config["device"] == "cuda":
+                models[model_id].to("cuda")
+                print(f"Model {model_id} moved to GPU")
+            else:
+                print(f"Using CPU for model {model_id}")
         else:
-            print("Using CPU")
-    else:
-        print("Model already loaded.")
+            print(f"Model {model_id} already loaded.")
 
 
-def unload_model():
-    """Unloads the model to free memory."""
-    global model, tokenizer
-    if model is not None:
-        print("Unloading model due to inactivity...")
-        del model
-        del tokenizer
-        torch.cuda.empty_cache()  # Free GPU memory if needed
-        model = None
-        tokenizer = None
+def unload_model(model_id: str):
+    """Unloads the specified model to free memory."""
+    global models, tokenizers
+    
+    if model_id in models and models[model_id] is not None:
+        print(f"Unloading model {model_id} due to inactivity...")
+        del models[model_id]
+        del tokenizers[model_id]
+        torch.cuda.empty_cache()
+        models[model_id] = None
+        tokenizers[model_id] = None
 
 
 async def monitor_inactivity():
-    """Background task to check if model should be unloaded."""
-    global last_request_time
+    """Background task to check if models should be unloaded."""
+    global last_request_times
     while True:
         await asyncio.sleep(60)  # Check every minute
-        if last_request_time and (time.time() - last_request_time) > unload_timeout:
-            unload_model()
-            last_request_time = None  # Reset timer
+        current_time = time.time()
+        for model_id, last_time in last_request_times.items():
+            if last_time and (current_time - last_time) > unload_timeout:
+                unload_model(model_id)
+                last_request_times[model_id] = None
 
 
-@app.on_event("startup")
+@router.on_event("startup")
 async def startup_event():
     """Start background monitoring task."""
     asyncio.create_task(monitor_inactivity())
 
 
-class SummarizeRequest(BaseModel):
+class ModelRequest(BaseModel):
     text: str
+    model_id: str
 
-@app.post("/summarize/")
-async def summarize(req: SummarizeRequest):
-    """Summarize input text using BART model."""
-    global last_request_time
-    load_model()
-    last_request_time = time.time()
 
-    device = model.device  # Get model device
-    inputs = tokenizer(req.text, return_tensors="pt").to(device)  # Move input to correct device
+@router.post("/process")
+async def process_text(req: ModelRequest):
+    """Process input text using specified model."""
+    global last_request_times
+    print("HERE")
+    if req.model_id not in MODEL_CONFIGS:
+        raise HTTPException(status_code=404, detail=f"Model {req.model_id} not found")
+    
+    config = MODEL_CONFIGS[req.model_id]
+    
 
-    summary_ids = model.generate(
-        **inputs, max_length=100, min_length=20, length_penalty=1.0, no_repeat_ngram_size=3, early_stopping=True
+    # TODO:- If request is coming from remote, and config type of that model is also remote, then decline the request and send beautiful words :)
+    if config["type"] == "remote":
+        # Forward request to remote machine
+        try:
+            response = requests.post(
+                config["endpoint"],
+                json={"text": req.text, "model_id": req.model_id}
+            )
+            return response.json()
+        except requests.exceptions.RequestException as e:
+            raise HTTPException(status_code=500, detail=f"Remote model error: {str(e)}")
+    
+    # Handle local model
+    load_model(req.model_id)
+    last_request_times[req.model_id] = time.time()
+    
+    model = models[req.model_id]
+    tokenizer = tokenizers[req.model_id]
+    device = model.device
+    
+    inputs = tokenizer(req.text, return_tensors="pt").to(device)
+    
+    outputs = model.generate(
+        **inputs, max_length=100, min_length=20, length_penalty=1.0, 
+        no_repeat_ngram_size=3, early_stopping=True
     )
+    
+    result = tokenizer.decode(outputs[0], skip_special_tokens=True)
+    return {"result": result}
 
-    summary = tokenizer.decode(summary_ids[0], skip_special_tokens=True)
-    return {"summary": summary}
 
-
-uvicorn.run(app,port=2345)
+def get_suggested_questions():
+    pass
