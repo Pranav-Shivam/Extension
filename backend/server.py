@@ -8,6 +8,7 @@ from pydantic import BaseModel
 import requests
 from typing import Dict, Optional
 import json
+from config import *
 
 
 router = APIRouter()
@@ -28,7 +29,7 @@ MODEL_CONFIGS = {
     "doc-qna": {
         "model_name": "impira/layoutlm-document-qa",
         "type": "remote",
-        "endpoint": "http://192.168.0.5:8000/process/",
+        "endpoint": f"http://{REMOTE_HOST}:8000/process/",
     }
 }
 
