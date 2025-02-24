@@ -21,12 +21,12 @@ unload_timeout = 300  # 5 minutes
 
 # Model configurations
 MODEL_CONFIGS = {
-    "summarization": {
-        "model_name": "facebook/bart-large-cnn",
+    "qna": {
+        "model_name": "deepset/roberta-base-squad2",
         "type": "local",
         "device": "cuda" if torch.cuda.is_available() else "cpu",
     },
-    "doc-qna": {
+    "summarization": {
         "model_name": "impira/layoutlm-document-qa",
         "type": "remote",
         "endpoint": f"http://{REMOTE_HOST}:8000/process/",

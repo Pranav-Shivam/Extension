@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+    <title>Q&A</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="qna_style.css" />
+  </head>
+  <body style="background: inherit;">
+    <!-- Main Container -->
+    <div class="container">
+      <!-- Navbar -->
+      <nav class="navbar">
+        <ul class="nav-list">
+          <li>
+            <a href="#" class="nav-link active" data-target="summaryPage">Summary</a>
+          </li>
+          <li><a href="#" class="nav-link" data-target="qnaPage">Q&A</a></li>
+          <li><a href="#" class="nav-link" data-target="extraPage">Extra</a></li>
+        </ul>
+      </nav>
+
+      <!-- Summary Page -->
+      <div id="summaryPage" class="page active">
+        <div class="summary-content">
+          This page provides an overview of the entire content. Here you will find a brief summary and five suggested questions to help you dive deeper into understanding the content better. The summary helps you grasp the main concepts quickly while the questions guide you towards important aspects of the content.
+        </div>
+        <div class="questions-container">
+          <div class="question-block">
+            <span class="question-text">What is the main purpose of this content?</span>
+            <input type="text" class="question-input" value="What is the main purpose of this content?">
+            <button class="edit-button">✎</button>
+          </div>
+          <div class="question-block">
+            <span class="question-text">How does this content benefit the user?</span>
+            <input type="text" class="question-input" value="How does this content benefit the user?">
+            <button class="edit-button">✎</button>
+          </div>
+          <div class="question-block">
+            <span class="question-text">What are the key features highlighted?</span>
+            <input type="text" class="question-input" value="What are the key features highlighted?">
+            <button class="edit-button">✎</button>
+          </div>
+          <div class="question-block">
+            <span class="question-text">Can you explain the main components?</span>
+            <input type="text" class="question-input" value="Can you explain the main components?">
+            <button class="edit-button">✎</button>
+          </div>
+          <div class="question-block">
+            <span class="question-text">Where can I find more information?</span>
+            <input type="text" class="question-input" value="Where can I find more information?">
+            <button class="edit-button">✎</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- QNA Page -->
+      <div id="qnaPage" class="page">
+        <h1 class="text-2xl font-bold text-gray-800 mb-4">Ask Me Anything</h1>
+        <div class="chat-container" id="chatbox"></div>
+        <div class="chat-input">
+          <textarea
+            id="questionInput"
+            placeholder="Type your question..."
+            required
+          ></textarea>
+          <button id="sendBtn" class="send-button">Send</button>
+        </div>
+      </div>
+
+      <!-- Extra Page -->
+      <div id="extraPage" class="page">
+        <h1 class="text-2xl font-bold text-gray-800 mb-4">Extra</h1>
+        <p class="text-gray-600 leading-relaxed">
+          This section is under construction. More features will be added here
+          soon.
+        </p>
+      </div>
+    </div>
+
+    <script src="qna_script.js"></script>
+  </body>
+</html>

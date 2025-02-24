@@ -6,6 +6,7 @@ from bs4 import BeautifulSoup
 import uvicorn
 from server import router
 import re
+from chat_ollama import ChatOllama
 
 app = FastAPI()
 app.include_router(router)
@@ -110,6 +111,27 @@ async def read_page(content: PageContent):
         raise HTTPException(
             status_code=500,
             detail=f"Error processing page content: {str(e)}"
+        )
+
+@app.get("/qna/{question}")
+async def get_answer(question: str):
+    try:
+        # Initialize Ollama model if not already initialized
+        model = ChatOllama(model="openhermes")
+        
+        # Process the question using Ollama
+        response = model.invoke(question)
+        
+        return {
+            "question": question,
+            "answer": response.content
+        }
+        
+    except Exception as e:
+        print(f"Error processing question: {str(e)}")
+        raise HTTPException(
+            status_code=500,
+            detail=f"Error processing question: {str(e)}"
         )
 
 if __name__ == "__main__":
