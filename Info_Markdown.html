@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Enhanced Info Button Component</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    }
+    
+    body {
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+      background-color: #f5f5f5;
+    }
+    
+    .container {
+      background-color: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      width: 800px;
+    }
+    
+    .input-container {
+      margin-bottom: 20px;
+    }
+    
+    .text-input {
+      width: 100%;
+      height: 200px;
+      padding: 12px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-family: monospace;
+      resize: vertical;
+      margin-bottom: 10px;
+    }
+    
+    .submit-button {
+      background-color: #1976d2;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: background-color 0.2s;
+    }
+    
+    .submit-button:hover {
+      background-color: #1565c0;
+    }
+    
+    .example-button {
+      background-color: #f0f0f0;
+      border: 1px solid #ddd;
+      padding: 6px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 13px;
+      margin-right: 8px;
+      transition: background-color 0.2s;
+    }
+    
+    .example-button:hover {
+      background-color: #e0e0e0;
+    }
+    
+    .demo-area {
+      margin-top: 30px;
+      padding: 15px;
+      border: 1px solid #eee;
+      border-radius: 8px;
+      background-color: #fafafa;
+    }
+    
+    .info-button {
+      background-color: transparent;
+      border: none;
+      cursor: pointer;
+      padding: 5px;
+      border-radius: 50%;
+      margin-right: 10px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: background-color 0.2s;
+    }
+    
+    .info-button:hover {
+      background-color: rgba(0, 0, 0, 0.04);
+    }
+    
+    .info-icon {
+      width: 22px;
+      height: 22px;
+      color: #616161;
+      transition: color 0.2s;
+    }
+    
+    .info-button:hover .info-icon {
+      color: #1976d2;
+    }
+    
+    .popover {
+      position: absolute;
+      background-color: white;
+      padding: 24px;
+      max-width: 480px;
+      max-height: 500px;
+      overflow-y: auto;
+      border-radius: 8px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+      z-index: 1000;
+      visibility: hidden;
+      opacity: 0;
+      transition: opacity 0.2s, visibility 0.2s;
+    }
+    
+    .popover.active {
+      visibility: visible;
+      opacity: 1;
+    }
+    
+    .section {
+      margin-bottom: 16px;
+    }
+    
+    .main-title {
+      font-size: 1.25rem;
+      font-weight: bold;
+      margin-bottom: 12px;
+      text-transform: uppercase;
+    }
+    
+    .subtitle {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-top: 24px;
+      margin-bottom: 12px;
+    }
+    
+    .numbered-item {
+      margin-top: 16px;
+      margin-bottom: 12px;
+      font-weight: 600;
+      background-color: rgba(0,0,0,0.03);
+      padding: 6px 12px;
+      border-radius: 4px;
+      border-left: 3px solid #1976d2;
+    }
+    
+    .nested-items {
+      margin-left: 16px;
+      margin-bottom: 16px;
+    }
+    
+    .bullet-point {
+      display: flex;
+      margin-bottom: 8px;
+      margin-left: 8px;
+    }
+    
+    .bullet-symbol {
+      font-weight: 500;
+      margin-right: 8px;
+      min-width: 12px;
+    }
+    
+    .calculation-line {
+      margin-bottom: 4px;
+      padding-left: 24px;
+      display: flex;
+      align-items: center;
+    }
+    
+    .arrow-symbol {
+      color: #1976d2;
+      font-weight: bold;
+      margin-right: 8px;
+    }
+    
+    .calculation-result {
+      font-family: monospace;
+      background-color: rgba(25, 118, 210, 0.08);
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-weight: 500;
+    }
+    
+    .keyword {
+      font-weight: 600;
+      min-width: 90px;
+      display: inline-block;
+    }
+    
+    .code-block {
+      font-family: monospace;
+      background-color: rgba(0,0,0,0.04);
+      padding: 4px 12px;
+      border-radius: 4px;
+      display: inline-block;
+    }
+    
+    .calculation-block {
+      font-family: monospace;
+      background-color: rgba(25, 118, 210, 0.05);
+      padding: 4px 12px;
+      border-radius: 4px;
+      display: inline-block;
+      font-weight: 500;
+    }
+    
+    .body-text {
+      font-size: 0.875rem;
+      margin-bottom: 4px;
+    }
+    
+    .keyword-container {
+      margin-bottom: 8px;
+      margin-left: 16px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Enhanced Info Tooltip Generator</h2>
+    
+    <div class="input-container">
+      <h3>Enter your content:</h3>
+      <p style="font-size: 14px; margin-bottom: 8px;">
+        Supports multiple formatting conventions:
+        <br>• Title with "====" underline for main titles
+        <br>• Title with "----" underline for subtitles 
+        <br>• ALL CAPS titles without underlines
+        <br>• Numbers with ** for highlighted items: "1. **Item Name**"
+        <br>• Simple numbered items: "1. Title"
+        <br>• Indented items with "•" bullet points
+        <br>• Calculations with "→" or "=" symbols
+        <br>• Special keywords: "Formula:", "Given:", "Calculation:"
+      </p>
+      <textarea id="infoContent" class="text-input" placeholder="Enter your content here..."></textarea>
+      <div style="margin-bottom: 10px;">
+        <button id="loadExample1" class="example-button">Load Example 1</button>
+        <button id="loadExample2" class="example-button">Load Example 2</button>
+        <button id="loadExample3" class="example-button">Load Example 3</button>
+      </div>
+      <button id="updateButton" class="submit-button">Update Info Tooltip</button>
+    </div>
+    
+    <div class="demo-area">
+      <h3>Demo: Hover over the info icon</h3>
+      <div style="margin-top: 20px; display: flex; align-items: center;">
+        <button id="infoButton" class="info-button" aria-label="Information">
+          <svg class="info-icon" focusable="false" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"></path>
+          </svg>
+        </button>
+        <span>Hover over this info icon to see your formatted content</span>
+      </div>
+    </div>
+    
+    <div id="infoPopover" class="popover">
+      <!-- Content will be generated from JavaScript -->
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const infoButton = document.getElementById('infoButton');
+      const popover = document.getElementById('infoPopover');
+      const infoContent = document.getElementById('infoContent');
+      const updateButton = document.getElementById('updateButton');
+      const loadExample1 = document.getElementById('loadExample1');
+      const loadExample2 = document.getElementById('loadExample2');
+      const loadExample3 = document.getElementById('loadExample3');
+      
+      let buttonHovered = false;
+      let popoverHovered = false;
+      
+      // Example 1: Calculation Methods
+      const example1 = `Calculation Methods
+===================
+
+Unit Price Calculations
+-------------------
+
+The system calculates various unit prices based on different formulas:
+
+1. **Base Unit Price**
+• Uses the raw cost of materials
+• Excludes any discounts or adjustments
+• Base for all other calculations
+
+2. **Adjusted Unit Price**
+• Takes into account volume discounts
+• Factors in market fluctuations
+• Regularly updated on a weekly basis
+
+3. **Net Unit Price**
+Formula: Base Price × (1 - Discount%)
+Given: Base Price = $100, Discount = 15%
+Calculation: $100 × (1 - 0.15) = $85
+
+4. **Gross Unit Price**
+• Includes all applicable taxes
+• Adds shipping and handling fees
+• Represents the final customer cost
+
+5. **Weighted Avg. Unit Price**
+Formula: Sum(Unit Price × Quantity) ÷ Total Quantity
+Given: 10 units @ $40, 5 units @ $50
+Calculation: (10 × $40 + 5 × $50) ÷ 15 = ($400 + $250) ÷ 15 = $650 ÷ 15 = $43.33`;
+
+      // Example 2: Product Features
+      const example2 = `Product Features
+===============
+
+Technical Specifications
+-------------------
+
+• 15.6" FHD IPS Display (1920 x 1080)
+• Intel Core i7-11800H Processor
+• 16GB DDR4 3200MHz RAM
+• 512GB NVMe SSD Storage
+• NVIDIA GeForce RTX 3060 6GB GDDR6
+
+1. **Performance Metrics**
+• Multi-core Score: 9876
+• Single-core Score: 1543
+• GPU Benchmark: 8750
+
+2. **Power Consumption**
+Formula: Wattage × Hours ÷ 1000 = kWh
+Given: 120W, 8 hours daily
+Calculation: 120 × 8 ÷ 1000 = 0.96 kWh per day
+
+Battery Information
+-------------------
+
+3. **Battery Life**
+• Up to 8 hours web browsing
+• Up to 6 hours video playback
+• Up to 3 hours gaming
+
+4. **Charging Options**
+• 180W AC Adapter (included)
+• USB-C Power Delivery (65W)
+• Power bank compatible`;
+
+      // Example 3: Calculation Summary
+      const example3 = `CALCULATION SUMMARY
+
+1. Inventory Totals
+   • Total Inventory EA: 95.0
+   • Total Inventory SQFT: 13460.0
+   • Total In Transit EA: 0.0
+   • Total In Transit SQFT: 0.0
+
+2. Net Demand Calculation
+   • Available SQFT = Inventory SQFT + In Transit SQFT
+     → 13460.0 + 0.0 = 13460.0
+
+   • Adjusted Demand = Production Firm Demand SQFT / 0.95
+     → 15280.0 / 0.95 = 16084.21052631579
+
+   • Net Demand SQFT = max(0, Adjusted Demand - Available SQFT)
+     → max(0, 16084.21052631579 - 13460.0) = 2624.21
+
+   • Net Demand EA = max(0, Production Firm Demand EA - (Inventory EA + In Transit EA))
+     → max(0, 862.0 - (95.0 + 0.0)) = 767.0`;
+
+      // Initialize with example 1
+      infoContent.value = example1;
+      updatePopoverContent();
+
+      // Set position of popover relative to button
+      function setPopoverPosition() {
+        const buttonRect = infoButton.getBoundingClientRect();
+        popover.style.top = (buttonRect.bottom + window.scrollY + 5) + 'px';
+        popover.style.left = (buttonRect.left + window.scrollX) + 'px';
+      }
+      
+      // Format the info content
+      function formatContent(content) {
+        // Check if the content is empty
+        if (!content || content.trim() === '') {
+          return '<div class="body-text">No content available</div>';
+        }
+        
+        const sections = content.split('\n\n');
+        let htmlContent = '';
+        
+        sections.forEach(section => {
+          const lines = section.split('\n');
+          const title = lines[0];
+          
+          // Main title with '=' underline
+          if (lines[1] && lines[1].startsWith('===')) {
+            htmlContent += `<div class="section">
+              <div class="main-title">${title}</div>
+              ${lines.slice(2).map(line => renderLine(line)).join('')}
+            </div>`;
+          }
+          // Subtitle with '-' underline
+          else if (lines[1] && lines[1].startsWith('---')) {
+            htmlContent += `<div class="section">
+              <div class="subtitle">${title}</div>
+              ${lines.slice(2).map(line => renderLine(line)).join('')}
+            </div>`;
+          }
+          // Title in ALL CAPS (like "CALCULATION SUMMARY")
+          else if (title === title.toUpperCase() && title.length > 3) {
+            htmlContent += `<div class="section">
+              <div class="main-title">${title}</div>
+              ${lines.slice(1).map(line => renderLine(line)).join('')}
+            </div>`;
+          }
+          // Regular section
+          else {
+            htmlContent += `<div class="section">
+              ${lines.map(line => renderLine(line)).join('')}
+            </div>`;
+          }
+        });
+        
+        return htmlContent;
+      }
+      
+      // Helper function to render individual lines
+      function renderLine(line) {
+        // Numbered items with asterisks (e.g., "1. **Base Unit Price**")
+        if (/^\d+\.\s+\*\*.*\*\*$/.test(line)) {
+          return `<div class="numbered-item">${line.replace(/\*\*/g, '')}</div>`;
+        }
+        
+        // Simple numbered items (e.g., "1. Inventory Totals")
+        else if (/^\d+\.\s+.+$/.test(line) && !line.includes('→') && !line.includes('•')) {
+          const indentation = line.match(/^\s*/)[0].length;
+          const indent = indentation > 0 ? ` style="margin-left:${indentation}px"` : '';
+          return `<div class="numbered-item"${indent}>${line.trim()}</div>`;
+        }
+        
+        // Indented bullet points (e.g., "   • Total Inventory EA: 95.0")
+        else if (line.includes('•')) {
+          const indentation = line.match(/^\s*/)[0].length;
+          const indent = indentation > 0 ? ` style="margin-left:${indentation/2}px"` : '';
+          const parts = line.trim().split('•');
+          return `<div class="bullet-point"${indent}>
+            <span class="bullet-symbol">•</span>
+            <span>${parts[1].trim()}</span>
+          </div>`;
+        }
+        
+        // Formula with arrow (e.g., "→ 13460.0 + 0.0 = 13460.0")
+        else if (line.includes('→')) {
+          const indentation = line.match(/^\s*/)[0].length;
+          const indent = indentation > 0 ? ` style="margin-left:${indentation/2}px"` : '';
+          const parts = line.trim().split('→');
+          return `<div class="calculation-line"${indent}>
+            <span class="arrow-symbol">→</span>
+            <span class="calculation-result">${parts[1].trim()}</span>
+          </div>`;
+        }
+        
+        // Special keywords
+        else if (line.startsWith('Formula:') || line.startsWith('Given:') || line.startsWith('Calculation:')) {
+          const [keyword, ...rest] = line.split(':');
+          const content = rest.join(':').trim();
+          
+          const blockClass = keyword === 'Calculation' ? 'calculation-block' : 'code-block';
+          
+          return `<div class="keyword-container">
+            <span class="keyword">${keyword}:</span>
+            <span class="${blockClass}">${content}</span>
+          </div>`;
+        }
+        
+        // Empty line or just spaces
+        else if (line.trim() === '') {
+          return '';
+        }
+        
+        // Regular text
+        else {
+          const indentation = line.match(/^\s*/)[0].length;
+          const indent = indentation > 0 ? ` style="margin-left:${indentation}px"` : '';
+          return `<div class="body-text"${indent}>${line.trim()}</div>`;
+        }
+      }
+      
+      // Update the popover content based on textarea input
+      function updatePopoverContent() {
+        const content = infoContent.value;
+        popover.innerHTML = formatContent(content);
+      }
+      
+      // Event handlers
+      updateButton.addEventListener('click', updatePopoverContent);
+      
+      loadExample1.addEventListener('click', function() {
+        infoContent.value = example1;
+        updatePopoverContent();
+      });
+      
+      loadExample2.addEventListener('click', function() {
+        infoContent.value = example2;
+        updatePopoverContent();
+      });
+      
+      loadExample3.addEventListener('click', function() {
+        infoContent.value = example3;
+        updatePopoverContent();
+      });
+      
+      infoButton.addEventListener('mouseenter', function() {
+        buttonHovered = true;
+        setPopoverPosition();
+        popover.classList.add('active');
+      });
+      
+      infoButton.addEventListener('mouseleave', function() {
+        buttonHovered = false;
+        setTimeout(updatePopoverVisibility, 100);
+      });
+      
+      popover.addEventListener('mouseenter', function() {
+        popoverHovered = true;
+      });
+      
+      popover.addEventListener('mouseleave', function() {
+        popoverHovered = false;
+        setTimeout(updatePopoverVisibility, 100);
+      });
+      
+      function updatePopoverVisibility() {
+        if (!buttonHovered && !popoverHovered) {
+          popover.classList.remove('active');
+        }
+      }
+      
+      // Update position on window resize
+      window.addEventListener('resize', function() {
+        if (popover.classList.contains('active')) {
+          setPopoverPosition();
+        }
+      });
+    });
+  </script>
+</body>
+</html>
